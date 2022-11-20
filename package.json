@@ -1,0 +1,19 @@
+{
+  "name": "dentist_handler",
+  "version": "1.0.0",
+  "description": "## Description The dentist handler is responsible for fetching dentist data from dentistry Json file and publishing the data to the frontend map for the user to see the dentists in Gothenburg.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.chalmers.se/courses/dit355/dit356-2022/t-5/t-5-dentisthandler.git"
+  },
+  "author": "team5",
+  "license": "ISC",
+  "dependencies": {
+    "mongoose": "^6.7.2",
+    "node-fetch": "^3.3.0"
+  }
+}
