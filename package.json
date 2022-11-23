@@ -1,5 +1,6 @@
 {
   "name": "dentist_handler",
+  "type": "module",
   "version": "1.0.0",
   "description": "## Description The dentist handler is responsible for fetching dentist data from dentistry Json file and publishing the data to the frontend map for the user to see the dentists in Gothenburg.",
   "main": "index.js",
@@ -13,8 +14,13 @@
   "author": "team5",
   "license": "ISC",
   "dependencies": {
+    "fetch": "^1.1.0",
     "mongoose": "^6.7.2",
     "mqtt": "^4.2.8",
+    "node": "^19.1.0",
     "node-fetch": "^3.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }
