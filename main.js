@@ -30,6 +30,9 @@ client.on('message', function (topic, message) {
 });
 
 
+
+
+
 // subscribe to topic 'my/test/topic'
 client.subscribe('my/test/topic');
 
