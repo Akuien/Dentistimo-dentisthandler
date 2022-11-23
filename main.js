@@ -34,7 +34,10 @@ client.on('message', function (topic, message) {
 
 
 // subscribe to topic 'my/test/topic'
-client.subscribe('my/test/topic');
+client.subscribe('my/test/topic3');
+client.subscribe('my/test/topic4');
 
 // publish message 'Hello' to topic 'my/test/topic'
-client.publish('my/test/topic', 'Hello');
+client.publish('my/test/topic1', 'Hello, Hope this is the booking handler reading');
+client.publish('my/test/topic2', 'Hello, I am dentist and ironically toothless');
+client.publish('my/test/topic5', 'This is topic 5');
