@@ -1,18 +1,16 @@
-var mqtt = require('mqtt');
+const mqtt = require('mqtt');
+const path = require('path')
+require('dotenv').config({ path: path.resolve(__dirname, './.env') })
 
-
-var options = {
-    host: '45fb8d87df7040eb8434cea2937cfb31.s1.eu.hivemq.cloud',
-    port: 8883,
-    protocol: 'mqtts',
-    username: 'Team5@Broker',
-    password: 'Team5@Broker'
-}
 
 // initialize the MQTT client
-var client = mqtt.connect(options);
-
-
+const client = mqtt.connect({
+    host: process.env.HOST,
+    port: process.env.PORT,
+    protocol: 'mqtts',
+    username: process.env.USERNAME,
+    password: process.env.PASSWORD
+  })
 
 // setup the callbacks
 client.on('connect', function () {
@@ -40,4 +38,5 @@ client.subscribe('my/test/topic4');
 // publish message 'Hello' to topic 'my/test/topic'
 client.publish('my/test/topic1', 'Hello, Hope this is the booking handler reading');
 client.publish('my/test/topic2', 'Hello, I am dentist and ironically toothless');
-client.publish('my/test/topic5', 'This is topic 5');
+
+client.publish('dentists/data', 'Hello userinterface!');
