@@ -10,7 +10,7 @@ var Dentist = require('../model/dentist');
         });
     });
     
-// not needed just a test
+
     router.post('/api/dentists', function (req, res, next) {
         var dentist = new Dentist(req.body);
         dentist.save(function (err, dentist) {

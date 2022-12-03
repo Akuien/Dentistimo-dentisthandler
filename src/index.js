@@ -1,9 +1,3 @@
-/* import fetch from 'node-fetch';
-import mongoose from 'mongoose';
-import express from 'express';
-import morgan from 'morgan';
-import cors from 'cors';
-import dentistController from './controller/dentists.js'; */
 var express = require('express');
 var mongoose = require('mongoose');
 var morgan = require('morgan');

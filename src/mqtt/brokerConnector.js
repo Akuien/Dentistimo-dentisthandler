@@ -1,6 +1,6 @@
 const mqtt = require('mqtt');
 const path = require('path')
-require('dotenv').config({ path: path.resolve(__dirname, './.env') })
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
 
 
 // initialize the MQTT client
@@ -28,15 +28,24 @@ client.on('message', function (topic, message) {
 });
 
 
-
-
+client.on('connect', function () {
+    // Subscribe to a topic
+    client.subscribe('get/dentist/data', function () {
+      // When a message arrives, print it to the console
+      client.on('message', function (topic, message, packet) {
+        console.log("Received '" + message + "' on '" + topic + "'")
+      })
+    })
+})
 
 // subscribe to topic 'my/test/topic'
 client.subscribe('my/test/topic3');
 client.subscribe('my/test/topic4');
+
 
 // publish message 'Hello' to topic 'my/test/topic'
 client.publish('my/test/topic1', 'Hello, Hope this is the booking handler reading');
 client.publish('my/test/topic2', 'Hello, I am dentist and ironically toothless');
 
 client.publish('dentists/data', 'Hello userinterface!');
+
