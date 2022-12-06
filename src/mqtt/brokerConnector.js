@@ -12,9 +12,19 @@ const client = mqtt.connect({
     password: process.env.PASSWORD
   })
 
+  /* client.on('connect', function () {
+    // Subscribe to a topic
+    client.subscribe('my/test/topic1', function () {
+      // When a message arrives, print it to the console
+      client.on('message', function (topic, message, packet) {
+        console.log("Received '" + message + "' on '" + topic + "'")
+      })
+    })
+}) */
+
 // setup the callbacks
 client.on('connect', function () {
-    console.log('Connected successfully');
+    console.log('mqtt Connected successfully');
 });
 
 client.on('error', function (error) {
@@ -27,25 +37,24 @@ client.on('message', function (topic, message) {
     console.log('Received message:', topic, message.toString());
 });
 
-
-client.on('connect', function () {
-    // Subscribe to a topic
-    client.subscribe('get/dentist/data', function () {
-      // When a message arrives, print it to the console
-      client.on('message', function (topic, message, packet) {
-        console.log("Received '" + message + "' on '" + topic + "'")
-      })
-    })
-})
-
 // subscribe to topic 'my/test/topic'
-client.subscribe('my/test/topic3');
+client.subscribe('my/test/topic1');
 client.subscribe('my/test/topic4');
+client.subscribe('dentistimo/dentists');
+;
 
 
 // publish message 'Hello' to topic 'my/test/topic'
-client.publish('my/test/topic1', 'Hello, Hope this is the booking handler reading');
-client.publish('my/test/topic2', 'Hello, I am dentist and ironically toothless');
+client.publish('my/test/topic5', 'Hello, Hope this is the booking handler reading');
+client.publish('my/test/topic6', 'Hello, I am dentist and ironically toothless');
 
-client.publish('dentists/data', 'Hello userinterface!');
+/* const publish = async (topic, message, qos = 0) => {
+  if (client) {
+    client.publish("dentistimo/" + topic, message, qos);
+  } else {
+    publish(topic, message);
+  }
+}; */
+
+//client.publish('dentists/data', 'Hello userinterface!');
 

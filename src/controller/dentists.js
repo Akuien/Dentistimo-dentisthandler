@@ -2,6 +2,43 @@ var express = require('express');
 const router = express.Router();
 var fetch  = require('node-fetch');
 var Dentist = require('../model/dentist');
+const { publish } = require("../mqtt/brokerConnector");
+const deviceRoot = "dentistimo/";
+const mqtt = require("mqtt");
+var mongoose = require('mongoose');
+
+
+// initialize the MQTT client
+const client = mqtt.connect({
+  host: process.env.HOST,
+  port: process.env.PORT,
+  protocol: 'mqtts',
+  username: process.env.USERNAME,
+  password: process.env.PASSWORD
+})
+
+client.on("message", (topic, message) => {
+  const data = JSON.parse(message);
+  console.log(data)
+  const method = data.method;
+
+  switch (method) {
+    case "getAll":
+      getAllDentists(data);
+      break;
+    case "getOne":
+      getDentist(data.id);
+      break;
+    default:
+      return console.log("Invalid method");
+  }
+});
+
+client.on("connect", (err) => {
+  client.subscribe(deviceRoot + "dentists");
+  console.log("Subscribed to dentistimo/dentists");
+});
+
 
     router.get('/api/dentists', function (req, res, next) {
         Dentist.find(function (err, dentist) {
@@ -19,6 +56,26 @@ var Dentist = require('../model/dentist');
         });
     
     });
+
+    const getAllDentists = () => {
+      db.collection("dentists")
+        .find({})
+        .toArray((err, user) => {
+          if (err) console.error(err);
+          const message = JSON.stringify(user);
+          subscribe("dentistimo/dentists", message);
+        });
+    };
+    
+    const getDentist = (userSsn) => {
+      db.collection("dentists")
+        .find({ ssn: userSsn })
+        .toArray((err, user) => {
+          if (err) console.error(err);
+          const message = JSON.stringify(user);
+          publish("dentists/dentist", message);
+        });
+    };
 
     async function getDentists(){
         try {
@@ -105,6 +162,19 @@ function getClinic(payload) {
             }
           };
     
+          // Variables
+var mongoURI = process.env.MONGODB_URI || 'mongodb+srv://Dentistimo:QsyJymgvpYZZeJPc@cluster0.hnkdpp5.mongodb.net/?retryWrites=true&w=majority'; 
+var port = process.env.PORT || 3000;
+// Connect to MongoDB
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true }, function(err) {
+    if (err) {
+        console.error(`Failed to connect to MongoDB with URI: ${mongoURI}`);
+        console.error(err.stack);
+        process.exit(1);
+    }
+    console.log(`Connected to MongoDB with URI: ${mongoURI}`);
+}); 
+
         const findOneDentist = async (filter) => {
           return Dentist.findOne(filter).exec();
         };
