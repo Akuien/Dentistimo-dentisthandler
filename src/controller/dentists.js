@@ -1,23 +1,47 @@
-var express = require('express');
-const router = express.Router();
+// var Dentist = require('../model/dentist');
+const mqtt = require('../mqtt/brokerConnector');
+const db = require('../DB');
 
-var Dentist = require('../model/dentist');
 
-    router.get('/api/dentists', function (req, res, next) {
-        Dentist.find(function (err, dentist) {
-            if (err) { return next(err); }
-            res.json({ "dentists": dentist });
-        });
+const onSubscription = () =>
+mqtt.client.on("message", async(topic, payload) => {
+    console.log("message recieved", topic, payload.toString());
+    switch (topic) {
+        case mqtt.subscribedTopics.getAll:
+          console.log("Publish all clinics");
+          publishAlldentists();
+          break;
+        case mqtt.subscribedTopics.getOne:
+          getDentists(payload);
+          break;
+        default:
+          break;
+      }
     });
+    const  publishAlldentists = async () => {
+      const dentists = await database.findDentists();
+      dentists.forEach((dentist) => {
+        mqtt.client.publish(
+          mqtt.publishedTopics.storedClinicTopic,
+          JSON.stringify(dentist),
+          { qos: 2 }
+        );
+        console.log("Dentists:" + dentist.name);
+      });
+    };
     
-
-    router.post('/api/dentists', function (req, res, next) {
-        var dentist = new Dentist(req.body);
-        dentist.save(function (err, dentist) {
-            if (err) { return next(err); }
-            res.status(201).json(dentist);
-        });
-    
-    });
+ 
+    function getDentists(payload) {
+      try {
+        let requestedDentist = JSON.parse(payload);
+        getDentistFromDB(requestedDentist);
+      } catch (error) {
+        mqtt.client.publish(
+          mqtt.publishedTopics.publishError,
+          "Parsing error: " + error.toString()
+        );
+        console.log(error);
+      }
+    }
     
 module.exports = router;

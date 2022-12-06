@@ -22,21 +22,48 @@ client.on('error', function (error) {
 });
 
 
-client.on('message', function (topic, message) {
-    // called each time a message is received
-    console.log('Received message:', topic, message.toString());
-});
+const subscribedTopics = {
+    getAll: "all/clinics",
+    getOne: "one/clinic",
+  };
+  const subscribsionResult = Object.values(subscribedTopics);
 
 
-client.on('connect', function () {
+  client.on('connect', function () {
     // Subscribe to a topic
-    client.subscribe('get/dentist/data', function () {
+    client.subscribe(subscribsionResult, function () {
       // When a message arrives, print it to the console
       client.on('message', function (topic, message, packet) {
         console.log("Received '" + message + "' on '" + topic + "'")
       })
     })
 })
+
+  const publishedTopics = {
+    failedClinicPublish: "send/clinic/fail",
+    SuccessfullClinicPublish: "dentists/data",
+    ErrorPublish: "clinicService/Error",
+  };
+  
+
+client.on('message', function (topic, message) {
+    // called each time a message is received
+    console.log('Received message:', topic, message.toString());
+});
+
+function UnsubscribeFromTopic() {
+    subscribsionResult.forEach((topic) => {
+      client.unsubscribe(topic, console.log("Unsubscribing from topic:" + topic));
+    });
+    client.end();
+    console.log("Disconnecting from MQTT.");
+  }
+
+  module.exports.subscribedTopics = subscribedTopics;
+  module.exports.publishedTopics = publishedTopics;
+  module.exports.UnsubscribeFromTopic = this.UnsubscribeFromTopic;
+
+
 
 // subscribe to topic 'my/test/topic'
 client.subscribe('my/test/topic3');
