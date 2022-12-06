@@ -1,24 +1,8 @@
-var express = require('express');
-const router = express.Router();
+
 var fetch  = require('node-fetch');
 var Dentist = require('../model/dentist');
-
-    router.get('/api/dentists', function (req, res, next) {
-        Dentist.find(function (err, dentist) {
-            if (err) { return next(err); }
-            res.json({ "dentists": dentist });
-        });
-    });
-    
-
-    router.post('/api/dentists', function (req, res, next) {
-        var dentist = new Dentist(req.body);
-        dentist.save(function (err, dentist) {
-            if (err) { return next(err); }
-            res.status(201).json(dentist);
-        });
-    
-    });
+var db = require ('../DBConnection')
+const mqtt = require('../mqtt/brokerConnector');
 
     async function getDentists(){
         try {
@@ -63,8 +47,8 @@ var Dentist = require('../model/dentist');
         };
         getDentists();
 
-       
 
+//publish
 function getClinic(payload) {
     try {
       let requestedClinic = JSON.parse(payload);
@@ -77,34 +61,62 @@ function getClinic(payload) {
       console.log(error);
     }
   }
-  
 
+
+  const  publishAlldentists = async () => {
+    const dentists = await findDentists();
+    dentists.forEach((dentist) => {
+      mqtt.client.publish(
+        mqtt.publishedTopics.storedClinics,
+        JSON.stringify(dentist),
+        { qos: 2 }
+      );
+      console.log("Dentists:" + dentist.name + dentist.address);
+    });
+  };
+  
+  
           const getClinicFromDatabase = async (requestedClinic) => {
             let clinicID = requestedClinic._id;
             try {
               const clinic = await findDentistById(clinicID);
               if (clinic !== null) {
                 mqtt.client.publish(
-                  mqtt.publishedTopics.publishOneClinicSucceeded,
+                  mqtt.publishedTopics.successfullClinicPublish,
                   JSON.stringify(JSON.stringify(clinic)),
                   { qos: 1 }
                 );
               } else {
                 mqtt.client.publish(
-                  mqtt.publishedTopics.publishOneClinicFailed,
+                  mqtt.publishedTopics.failedClinicPublish,
                   JSON.stringify({ error: "Clinic not found in the database." }),
                   { qos: 1 }
                 );
               }
             } catch (err) {
               mqtt.client.publish(
-                mqtt.publishedTopics.publishOneClinicFailed,
+                mqtt.publishedTopics.failedClinicPublish,
                 JSON.stringify({ error: err.message }),
                 { qos: 1 }
               );
             }
           };
-    
+
+       function onSubscription () 
+          mqtt.client.on("message", async(topic, payload) => {
+              console.log("message sent", topic, payload.toString());
+              switch (topic) {
+                  case mqtt.subscribedTopics.getAll:
+                    publishAlldentists();
+                    break;
+                  case mqtt.subscribedTopics.getOne:
+                    getClinic(payload);
+                    break;
+                  default:
+                    break;
+                }
+              });
+              
         const findOneDentist = async (filter) => {
           return Dentist.findOne(filter).exec();
         };
@@ -122,4 +134,8 @@ function getClinic(payload) {
             return Dentist.find(filter).exec();
           };
      
-module.exports = router;
+
+          module.exports.findDentists = findDentists;
+          module.exports.findDentistById = findDentistById;
+          module.exports.findOneDentist = findOneDentist;  
+          module.exports.saveDentist = saveDentist;
