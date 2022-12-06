@@ -1,8 +1,9 @@
 
 var fetch  = require('node-fetch');
 var Dentist = require('../model/dentist');
-var db = require ('../DBConnection')
-const mqtt = require('../mqtt/brokerConnector');
+var db = require ('../index')
+
+var mqtt = require('../mqtt/brokerConnector');
 
     async function getDentists(){
         try {
@@ -102,7 +103,7 @@ function getClinic(payload) {
             }
           };
 
-       function onSubscription () 
+       const onSubscription = () =>
           mqtt.client.on("message", async(topic, payload) => {
               console.log("message sent", topic, payload.toString());
               switch (topic) {
