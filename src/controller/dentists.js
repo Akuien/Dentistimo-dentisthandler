@@ -2,11 +2,12 @@ var express = require('express');
 const router = express.Router();
 var fetch  = require('node-fetch');
 var Dentist = require('../model/dentist');
-const { publish } = require("../mqtt/brokerConnector");
-const deviceRoot = "dentistimo/";
+// const { publish } = require("../mqtt/brokerConnector");
+// const deviceRoot = "dentistimo/";
 const mqtt = require("mqtt");
 var mongoose = require('mongoose');
-
+let topicResponse1 = "ui/dental-clinic";
+let topicResponse2 = "ui/get-dental-clinic";
 
 // initialize the MQTT client
 const client = mqtt.connect({
@@ -16,31 +17,9 @@ const client = mqtt.connect({
   username: process.env.USERNAME,
   password: process.env.PASSWORD
 })
+  
 
-client.on("message", (topic, message) => {
-  const data = JSON.parse(message);
-  console.log(data)
-  const method = data.method;
-
-  switch (method) {
-    case "getAll":
-      getAllDentists(data);
-      break;
-    case "getOne":
-      getDentist(data.id);
-      break;
-    default:
-      return console.log("Invalid method");
-  }
-});
-
-client.on("connect", (err) => {
-  client.subscribe(deviceRoot + "dentists");
-  console.log("Subscribed to dentistimo/dentists");
-});
-
-
-    router.get('/api/dentists', function (req, res, next) {
+router.get('/api/dentists', function (req, res, next) {
         Dentist.find(function (err, dentist) {
             if (err) { return next(err); }
             res.json({ "dentists": dentist });
@@ -56,26 +35,6 @@ client.on("connect", (err) => {
         });
     
     });
-
-    const getAllDentists = () => {
-      db.collection("dentists")
-        .find({})
-        .toArray((err, user) => {
-          if (err) console.error(err);
-          const message = JSON.stringify(user);
-          subscribe("dentistimo/dentists", message);
-        });
-    };
-    
-    const getDentist = (userSsn) => {
-      db.collection("dentists")
-        .find({ ssn: userSsn })
-        .toArray((err, user) => {
-          if (err) console.error(err);
-          const message = JSON.stringify(user);
-          publish("dentists/dentist", message);
-        });
-    };
 
     async function getDentists(){
         try {
@@ -120,48 +79,11 @@ client.on("connect", (err) => {
         };
         getDentists();
 
-       
+        const findOneDentist = async (filter) => {
+          return Dentist.findOne(filter).exec();
+        };
 
-function getClinic(payload) {
-    try {
-      let requestedClinic = JSON.parse(payload);
-      getClinicFromDatabase(requestedClinic);
-    } catch (error) {
-      mqtt.client.publish(
-        mqtt.publishedTopics.publishError,
-        "Parsing error: " + error.toString()
-      );
-      console.log(error);
-    }
-  }
-  
 
-          const getClinicFromDatabase = async (requestedClinic) => {
-            let clinicID = requestedClinic._id;
-            try {
-              const clinic = await findDentistById(clinicID);
-              if (clinic !== null) {
-                mqtt.client.publish(
-                  mqtt.publishedTopics.publishOneClinicSucceeded,
-                  JSON.stringify(JSON.stringify(clinic)),
-                  { qos: 1 }
-                );
-              } else {
-                mqtt.client.publish(
-                  mqtt.publishedTopics.publishOneClinicFailed,
-                  JSON.stringify({ error: "Clinic not found in the database." }),
-                  { qos: 1 }
-                );
-              }
-            } catch (err) {
-              mqtt.client.publish(
-                mqtt.publishedTopics.publishOneClinicFailed,
-                JSON.stringify({ error: err.message }),
-                { qos: 1 }
-              );
-            }
-          };
-    
           // Variables
 var mongoURI = process.env.MONGODB_URI || 'mongodb+srv://Dentistimo:QsyJymgvpYZZeJPc@cluster0.hnkdpp5.mongodb.net/?retryWrites=true&w=majority'; 
 var port = process.env.PORT || 3000;
@@ -175,21 +97,49 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true }, 
     console.log(`Connected to MongoDB with URI: ${mongoURI}`);
 }); 
 
-        const findOneDentist = async (filter) => {
-          return Dentist.findOne(filter).exec();
-        };
+          function getDentist(topic, payload) {
 
-        const findDentistById = async (id) => {
-            return Dentist.findById(id).exec();
-          };
-          
-          const saveDentist = async (dentist) => {
-            const data = new Dentist(dentist);
-            return data.save();
-          };
-
-          const findDentists = async (filter) => {
-            return Dentist.find(filter).exec();
-          };
-     
+            if (topic == "dentist/getdentistbyId") {
+                Dentist.findOne({ _id: payload.toString() }).exec(function (err, dentists) {
+                    if (err) {
+                        return next(err);
+                    }
+                    console.log("Dental Clinic", dentists);
+        
+                    let dentistsJson = JSON.stringify(dentists);
+                    client.publish(
+                        topicResponse2,
+                        dentistsJson,
+                        { qos: 1, retain: false },
+                        (error) => {
+                            if (error) {
+                                console.error(error);
+                            }
+                        }
+                    );
+                });
+            } else if (topic == "dentist/getAllDentists") {
+                Dentist.find(function (err, dentists) {
+                    if (err) {
+                        return next(err);
+                    }
+        
+                    console.log("Dental Clinic", dentists);
+        
+                    let dentistsJson = JSON.stringify(dentists);
+                    client.publish(
+                        topicResponse1,
+                        dentistsJson,
+                        { qos: 1, retain: false },
+                        (error) => {
+                            if (error) {
+                                console.error(error);
+                            }
+                        }
+                    );
+                });
+            }
+        }
+        module.exports.getDentists = getDentists;
+        module.exports.getDentist = getDentist;
 module.exports = router;
