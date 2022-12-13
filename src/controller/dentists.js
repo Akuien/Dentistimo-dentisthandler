@@ -18,24 +18,6 @@ const client = mqtt.connect({
   password: process.env.PASSWORD
 })
   
-
-router.get('/api/dentists', function (req, res, next) {
-        Dentist.find(function (err, dentist) {
-            if (err) { return next(err); }
-            res.json({ "dentists": dentist });
-        });
-    });
-    
-
-    router.post('/api/dentists', function (req, res, next) {
-        var dentist = new Dentist(req.body);
-        dentist.save(function (err, dentist) {
-            if (err) { return next(err); }
-            res.status(201).json(dentist);
-        });
-    
-    });
-
     async function getDentists(){
         try {
         const fetchDentists = await fetch("https://raw.githubusercontent.com/feldob/dit355_2020/master/dentists.json");

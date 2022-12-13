@@ -13,8 +13,7 @@ function getDentist(topic, payload) {
           if (err) {
               return next(err);
           }
-          console.log("Dental Clinicc", dentists);
-        
+          console.log("Dental Clinicc", dentists + 'supp')
           let dentistsJson = JSON.stringify(dentists);
           client.publish(
               topicResponse2,
@@ -50,6 +49,7 @@ function getDentist(topic, payload) {
   }
 }
 
+
 // initialize the MQTT client
 const client = mqtt.connect({
     host: process.env.HOST,
@@ -68,7 +68,16 @@ client.on("connect", () => {
   });
 });
 
-// Dentist.getDentists()
+client.on('connect', function () {
+    console.log('Connected') // subscribe and publish to the same topic
+    client.subscribe('dentist/getAllDentists', function (err) {
+      if (!err) {
+        client.publish('ui/dental-clinic', 'Hello mqtt all UI!!')
+      }
+    })
+  })
+
+//Dentist.getDentists()
 
 client.on("message", (topic, payload) => {
   console.log('Received message here:', topic, payload.toString());
