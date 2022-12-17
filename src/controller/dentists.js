@@ -123,4 +123,3 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true }, 
         }
         module.exports.getDentists = getDentists;
         module.exports.getDentist = getDentist;
-module.exports = router;
