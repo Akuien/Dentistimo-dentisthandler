@@ -1,15 +1,8 @@
 var express = require('express');
 var mongoose = require('mongoose');
-const mqtt = require('mqtt');
-const path = require('path')
-require('dotenv').config({ path: path.resolve(__dirname, '.env') })
 var Dentist = require('./model/dentist');
-
 var dentistsController = require("./controller/dentists");
 var mqtt = require("mqtt");
-var fetch = require("node-fetch");
-var mongoose = require("mongoose");
-var Dentist = require('./model/dentist');
 const path = require('path')
 require('dotenv').config({ path: path.resolve(__dirname, '.env') })
 
