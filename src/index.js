@@ -1,9 +1,9 @@
 var express = require('express');
 var mongoose = require('mongoose');
-var morgan = require('morgan');
-var path = require('path');
-var cors = require('cors');
-var history = require('connect-history-api-fallback');
+const mqtt = require('mqtt');
+const path = require('path')
+require('dotenv').config({ path: path.resolve(__dirname, '.env') })
+var Dentist = require('./model/dentist');
 
 var dentistsController = require("./controller/dentists");
 
@@ -20,60 +20,56 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true }, 
     console.log(`Connected to MongoDB with URI: ${mongoURI}`);
 }); 
 
-// Create Express app
-var app = express();
-// Parse requests of content-type 'application/json'
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-// HTTP request logger
-app.use(morgan('dev'));
-app.options('*', cors());
-app.use(cors());
+// initialize the MQTT client
+const client = mqtt.connect({
+    host: process.env.HOST,
+    port: process.env.PORT,
+    protocol: 'mqtts',
+    username: process.env.USERNAME,
+    password: process.env.PASSWORD
+  })
 
-// Import routes
-app.get('/api', function(req, res) {
-    res.json({'message': 'Welcome!'});
-});
 
-app.use(dentistsController);
 
-// Catch all non-error handler for api (i.e., 404 Not Found)
-app.use('/api/*', function (req, res) {
-    res.status(404).json({ 'message': 'Not Found' });
-});
+  let topic = "dentist/getAllDentists";
+  
 
-// Configuration for serving frontend in production mode
-app.use(history());
-// Serve static assets
-var root = path.normalize(__dirname + '/..');
-var client = path.join(root, 'client', 'dist');
-app.use(express.static(client));
+  client.on("message", function (topic, message) {
+    console.log(String.fromCharCode.apply(null, message)); 
+  });
+  
 
-// Error handler 
-var env = app.get('env');
-// eslint-disable-next-line no-unused-vars
-app.use(function(err, req, res, next) {
-    console.error(err.stack);
-    var err_res = {
-        'message': err.message,
-        'error': {}
-    };
-    if (env === 'development') {
-        // Return sensitive stack trace only in dev mode
-        err_res['error'] = err.stack;
-    }
-    res.status(err.status || 500);
-    res.json(err_res);
-});
+  client.on("connect", () => {
+    console.log("Connected!");
+  });
+  
 
-app.listen(port, function(err) {
-    if (err) throw err;
-    console.log(`Express server listening on port ${port}, in ${env} mode`);
-    console.log(`Backend: http://localhost:${port}/api/`);
-    console.log(`Frontend (production): http://localhost:${port}/`);
-});
+  client.on("error", (error) => {
+    console.log("Error:", error);
+  });
+  
+  
+  client.subscribe("dentists");
+  client.publish("message1", 'yup this message one');
+  
+  if (topic == "dentist/getAllDentists") {
+    Dentist.find(function (err, dentists) {
+      if (err) {
+        return next(err);
+      }
+  
 
-module.exports = app;
+      let dentistsJson = JSON.stringify(dentists);
+      client.publish("dentist/getAllDentists", dentistsJson, { qos: 1, retain: true },
+        (error) => {
+          if (error) {
+            console.error(error);
+          }
+        }
+      );
+    });
+  }
+  
 
 
 
