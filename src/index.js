@@ -6,6 +6,12 @@ require('dotenv').config({ path: path.resolve(__dirname, '.env') })
 var Dentist = require('./model/dentist');
 
 var dentistsController = require("./controller/dentists");
+var mqtt = require("mqtt");
+var fetch = require("node-fetch");
+var mongoose = require("mongoose");
+var Dentist = require('./model/dentist');
+const path = require('path')
+require('dotenv').config({ path: path.resolve(__dirname, '.env') })
 
 // Variables
 var mongoURI = process.env.MONGODB_URI || 'mongodb+srv://Dentistimo:QsyJymgvpYZZeJPc@cluster0.hnkdpp5.mongodb.net/?retryWrites=true&w=majority'; 

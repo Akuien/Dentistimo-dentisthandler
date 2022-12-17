@@ -1,5 +1,4 @@
-var express = require('express');
-const router = express.Router();
+
 var fetch  = require('node-fetch');
 var Dentist = require('../model/dentist');
 // const { publish } = require("../mqtt/brokerConnector");
