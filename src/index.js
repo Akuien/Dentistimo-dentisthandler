@@ -19,25 +19,23 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true }, 
     console.log(`Connected to MongoDB with URI: ${mongoURI}`);
 }); 
 
-// initialize the MQTT client
-const client = mqtt.connect({
-    host: process.env.HOST,
-    port: process.env.PORT,
-    protocol: 'mqtts',
-    username: process.env.USERNAME,
-    password: process.env.PASSWORD
-  })
+const options = {
+  host: '45fb8d87df7040eb8434cea2937cfb31.s1.eu.hivemq.cloud',
+  port: 8883,
+  protocol: 'mqtts',
+  username: 'Team5@Broker',
+  password: 'Team5@Broker'
+}
 
+const client = mqtt.connect(options)
 
 
   let topic = "dentist/getAllDentists";
-  
 
   client.on("message", function (topic, message) {
     console.log(String.fromCharCode.apply(null, message)); 
   });
   
-
   client.on("connect", () => {
     console.log("Connected!");
   });
@@ -56,8 +54,6 @@ const client = mqtt.connect({
       if (err) {
         return next(err);
       }
-  
-
       let dentistsJson = JSON.stringify(dentists);
       client.publish("dentist/getAllDentists", dentistsJson, { qos: 1, retain: true },
         (error) => {
@@ -67,8 +63,26 @@ const client = mqtt.connect({
         }
       );
     });
+  } else if (topic == "dentist/getdentistbyId") {
+    Dentist.findOne({ _id: payload.toString() }).exec(function (err, dentists) {
+        if (err) {
+            return next(err);
+        }
+        let dentistsJson = JSON.stringify(dentists);
+        client.publish("ui/get-dental-clinic", dentistsJson,
+            { qos: 1, retain: false },
+            (error) => {
+                if (error) {
+                    console.error(error);
+                }
+            }
+        );
+    });
   }
-  
+
+
+
+
 
 
 
