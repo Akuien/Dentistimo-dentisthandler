@@ -25,7 +25,7 @@ This component uses the following dependencies:
 
 Get started:
 1. Clone the repository
-2. Run `cd sr`
+2. Run `cd src`
 3. To Install the component dependencies run `npm install` in the terminal 
 4. And finally to start  the application prompt  `node index.js`in the terminal.
 
@@ -37,7 +37,6 @@ Authors and acknowledgment(Team Members)
 * Nazli Moghaddam
 * Jonna Johansson
 * Sergey Balan
-
 ##
 **More details about this system can be found in:** [Documentation](https://git.chalmers.se/courses/dit355/dit356-2022/t-5/t-5-documentation)
 
