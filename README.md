@@ -20,7 +20,7 @@ The Dentist handler acts as a subscriber when receiving the dental clinic reques
 This component uses the following dependencies:
 
 - Node JS
-- MQTT
+- HiveMQ Cloud
 - Mongoose
 
 Get started:
