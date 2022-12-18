@@ -13,7 +13,8 @@ The dentist handler is responsible for fetching dentist data from the dentistry 
 * Publish dentistry data via MQTT 
 
 ## Architectural style
-* Publish and subscribe:
+- **Publish and subscribe:**
+
 The Dentist handler acts as a subscriber when receiving the dental clinic requests from the user interface component. It then searches the database for either all clinics or the requested clinic and publishes the results to the MQTT Broker.
 
 ## Technologies:
