@@ -56,6 +56,7 @@ const client = mqtt.connect(options)
   
   
   client.subscribe("dentists");
+  client.subscribe("dentist/getdentistbyId");
   client.publish("message1", 'yup this message one');
   
  /*  if (topic == "dentist/getAllDentists") {
@@ -98,7 +99,7 @@ const client = mqtt.connect(options)
           }
           let dentistsJson = JSON.stringify(dentists);
           client.publish(
-              "dentist/getdentistbyId",
+              "ui/dentist/getdentistbyId",
               dentistsJson,
               { qos: 1, retain: true },
               (error) => {
