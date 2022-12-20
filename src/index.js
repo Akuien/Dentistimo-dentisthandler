@@ -90,7 +90,7 @@ const client = mqtt.connect(options)
     });
   } */
 
-  function getDentist(topic, payload) {
+  function getDentist(topic, payload, next) {
 
   if (topic == "dentist/getdentistbyId") {
       Dentist.findOne({ _id: payload.toString() }).exec(function (err, dentists) {
