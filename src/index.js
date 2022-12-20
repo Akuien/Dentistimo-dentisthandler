@@ -6,6 +6,7 @@ var mqtt = require("mqtt");
 const path = require('path')
 require('dotenv').config({ path: path.resolve(__dirname, '.env') })
 
+
 // Variables
 var mongoURI = process.env.MONGODB_URI || 'mongodb+srv://Dentistimo:QsyJymgvpYZZeJPc@cluster0.hnkdpp5.mongodb.net/?retryWrites=true&w=majority'; 
 var port = process.env.PORT || 3000;
@@ -30,11 +31,19 @@ const options = {
 const client = mqtt.connect(options)
 
 
-  let topic = "dentist/getAllDentists";
+  let topic = "dentist#";
+  //let topic = "dentist/getAllDentists";
 
   client.on("message", function (topic, message) {
     console.log(String.fromCharCode.apply(null, message)); 
   });
+
+  client.on("message", (topic, payload) => {
+    console.log('Received message here:', topic, payload.toString());
+    console.log(payload.toString());
+    getDentist(topic, payload);
+  });
+  
   
   client.on("connect", () => {
     console.log("Connected!");
@@ -49,7 +58,7 @@ const client = mqtt.connect(options)
   client.subscribe("dentists");
   client.publish("message1", 'yup this message one');
   
-  if (topic == "dentist/getAllDentists") {
+ /*  if (topic == "dentist/getAllDentists") {
     Dentist.find(function (err, dentists) {
       if (err) {
         return next(err);
@@ -70,7 +79,7 @@ const client = mqtt.connect(options)
         }
         let dentistsJson = JSON.stringify(dentists);
         client.publish("ui/get-dental-clinic", dentistsJson,
-            { qos: 1, retain: false },
+            { qos: 1, retain: true },
             (error) => {
                 if (error) {
                     console.error(error);
@@ -78,7 +87,47 @@ const client = mqtt.connect(options)
             }
         );
     });
+  } */
+
+  function getDentist(topic, payload) {
+
+  if (topic == "dentist/getdentistbyId") {
+      Dentist.findOne({ _id: payload.toString() }).exec(function (err, dentists) {
+          if (err) {
+              return next(err);
+          }
+          let dentistsJson = JSON.stringify(dentists);
+          client.publish(
+              "dentist/getdentistbyId",
+              dentistsJson,
+              { qos: 1, retain: true },
+              (error) => {
+                  if (error) {
+                      console.error(error);
+                  }
+              }
+          );
+      });
+  } else if (topic == "dentist/getAllDentists") {
+    Dentist.find(function (err, dentists) {
+      if (err) {
+        return next(err);
+      }
+       console.log("Dental Clinic", dentists);
+
+       let dentistsJson = JSON.stringify(dentists);
+       client.publish("dentist/getAllDentists", dentistsJson, { qos: 1, retain: true },
+         (error) => {
+           if (error) {
+             console.error(error);
+           }
+              }
+          );
+      });
   }
+}
+
+
 
 
 
