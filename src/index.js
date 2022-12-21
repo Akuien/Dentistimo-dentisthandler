@@ -30,9 +30,7 @@ const options = {
 
 const client = mqtt.connect(options)
 
-
-  //let topic = "dentist#";
-  let topic = "dentist/getAllDentists";
+  let topic = "dentist/";
 
   client.on("message", function (topic, message) {
     console.log(String.fromCharCode.apply(null, message)); 
@@ -40,7 +38,7 @@ const client = mqtt.connect(options)
 
   client.on("message", (topic, payload) => {
     console.log('Received message here:', topic, payload.toString());
-    console.log(payload.toString());
+    //console.log(payload.toString());
   });
   
   
@@ -57,7 +55,7 @@ const client = mqtt.connect(options)
   client.subscribe("dentists");
   client.subscribe("dentist/getdentistbyId");
   client.publish("message1", 'yup this message one');
-  
+
   if (topic == "dentist/getAllDentists") {
     Dentist.find(function (err, dentists) {
       if (err) {
