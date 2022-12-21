@@ -6,7 +6,7 @@ var Dentist1 = require('../model/dentist');
 let topicResponse1 = "ui/dental-clinic";
 let topicResponse2 = "ui/get-dental-clinic";
 
-function getDentist(topic, payload) {
+/* function getDentist(topic, payload) {
 
   if (topic == "dentist/getdentistbyId") {
       Dentist1.findOne({ _id: payload.toString() }).exec(function (err, dentists) {
@@ -48,7 +48,7 @@ function getDentist(topic, payload) {
       });
   }
 }
-
+ */
 
 // initialize the MQTT client
 const client = mqtt.connect({
@@ -82,7 +82,6 @@ client.on('connect', function () {
 client.on("message", (topic, payload) => {
   console.log('Received message here:', topic, payload.toString());
   console.log(payload.toString());
-  getDentist(topic, payload);
 });
 
 // setup the callbacks
