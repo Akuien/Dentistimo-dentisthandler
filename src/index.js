@@ -54,17 +54,69 @@ const client = mqtt.connect(options)
   });
   
   
-  client.subscribe("dentists");
   client.subscribe("dentist/getdentistbyId");
-  client.publish("message1", 'yup this message one');
+  // client.subscribe("dentist/getAllDentists");
 
+  client.subscribe('dentist/getAllDentists', function () {
+    // When a message arrives, print it to the console
+    client.on('message', function (topic, message) {
+  
+      console.log("Received '" + message + "' on '" + topic + "'")
+    
+      if (topic == "dentist/getAllDentists") {
+        Dentist.find(function (err, dentists) {
+          if (err) {
+            return next(err);
+          }
+          let dentistsJson = JSON.stringify(dentists);
+          client.publish("ui/dentist/getAllDentists", dentistsJson, { qos: 1, retain: true },
+            (error) => {
+              if (error) {
+                console.error(error);
+              }
+            }
+          );
+        });
+      } 
+    })
+  })
+
+/*   client.subscribe('dentist/getdentistbyId', function () {
+    // When a message arrives, print it to the console
+    client.on('message', function (topic, message) {
+  
+      console.log("Received '" + message + "' on '" + topic + "'")
+    
+      if (topic == "dentist/getdentistbyId") {
+        Dentist.findOne({ _id: message.toString() }).exec(function (err, dentists) {
+            
+            let dentistsJson = JSON.stringify(dentists);
+            console.log("sent to ui!" + dentistsJson);
+            client.publish(
+                "ui/dentist/getdentistbyId",
+                dentistsJson,
+                { qos: 1, retain: true },
+                (error) => {
+                    if (error) {
+                        console.error(error);
+                    }
+                    console.log("sent to ui!" + dentistsJson);
+                }
+            );
+        });
+    } 
+  })
+  }) */
+
+
+/* 
   if (topic == "dentist/getAllDentists") {
     Dentist.find(function (err, dentists) {
       if (err) {
         return next(err);
       }
       let dentistsJson = JSON.stringify(dentists);
-      client.publish("dentist/getAllDentists", dentistsJson, { qos: 1, retain: true },
+      client.publish("ui/dentist/getAllDentists", dentistsJson, { qos: 1, retain: true },
         (error) => {
           if (error) {
             console.error(error);
@@ -73,12 +125,14 @@ const client = mqtt.connect(options)
       );
     });
   } 
+  */
   if (topic == "dentist/getdentistbyId") {
       Dentist.findOne({ _id: payload.toString() }).exec(function (err, dentists) {
           if (err) {
               return next(err);
           }
           let dentistsJson = JSON.stringify(dentists);
+          console.log("sent to ui!" + dentistsJson);
           client.publish(
               "ui/dentist/getdentistbyId",
               dentistsJson,
@@ -87,54 +141,10 @@ const client = mqtt.connect(options)
                   if (error) {
                       console.error(error);
                   }
+                  console.log("sent to ui!" + dentistsJson);
               }
           );
       });
-  } 
+  }  
 
-  /*function getDentist(topic, payload, next) {
-
-   if (topic == "dentist/getdentistbyId") {
-      Dentist.findOne({ _id: payload.toString() }).exec(function (err, dentists) {
-          if (err) {
-              return next(err);
-          }
-          let dentistsJson = JSON.stringify(dentists);
-          client.publish(
-              "ui/dentist/getdentistbyId",
-              dentistsJson,
-              { qos: 1, retain: true },
-              (error) => {
-                  if (error) {
-                      console.error(error);
-                  }
-              }
-          );
-      });
-  } else if (topic == "dentist/getAllDentists") {
-    Dentist.find(function (err, dentists) {
-      if (err) {
-        return next(err);
-      }
-       console.log("Dental Clinic", dentists);
-
-       let dentistsJson = JSON.stringify(dentists);
-       client.publish("dentist/getAllDentists", dentistsJson, { qos: 1, retain: true },
-         (error) => {
-           if (error) {
-             console.error(error);
-           }
-              }
-          );
-      });
-  }
-} */
-
-
-
-
-
-
-
-
-
+  
