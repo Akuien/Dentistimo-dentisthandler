@@ -30,7 +30,9 @@ const options = {
 
 const client = mqtt.connect(options)
 
-  let topic = "dentist/";
+  // let topic = "dentist/";
+  let topic = "dentist/getAllDentists"
+
 
   client.on("message", function (topic, message) {
     console.log(String.fromCharCode.apply(null, message)); 
