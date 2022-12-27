@@ -142,23 +142,25 @@ client.subscribe('dentist/get-AllDentists', function () {
           return next(err);
         }
         let dentistsJson = JSON.stringify(dentists);
-        client.publish("ui/dentist/getAllDentists", dentistsJson, { qos: 1, retain: true },
+        client.publish("ui/dentist/getAllDentists", dentistsJson, 1 ,
           (error) => {
             if (error) {
               console.error(error);
             }
-            console.log("sent to ui!" + dentistsJson);
+            console.log("sent to ui!" )
+            //console.log("sent to ui!" + dentistsJson);
           }
         );
       });
     } else if (topic == "dentist/getdentistbyId") {
       Dentist.findOne({ _id: message.toString() }).exec(function (err, dentists) {
-          
+        /* if (err) {
+          return next(err);
+        } */
           let dentistsJson = JSON.stringify(dentists);
           client.publish(
               "ui/dentist/getdentistbyId",
-              dentistsJson,
-              { qos: 1, retain: true },
+              dentistsJson, 1,
               (error) => {
                   if (error) {
                       console.error(error);
