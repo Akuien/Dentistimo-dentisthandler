@@ -69,7 +69,7 @@ const client = mqtt.connect(options)
             return next(err);
           }
           let dentistsJson = JSON.stringify(dentists);
-          client.publish("ui/dentist/getAllDentists", dentistsJson, { qos: 1, retain: true },
+          client.publish("ui/dentist/getAllDentists", dentistsJson, { qos: 1, retain: false },
             (error) => {
               if (error) {
                 console.error(error);
@@ -136,7 +136,7 @@ const client = mqtt.connect(options)
           client.publish(
               "ui/dentist/getdentistbyId",
               dentistsJson,
-              { qos: 1, retain: true },
+              { qos: 1, retain: false },
               (error) => {
                   if (error) {
                       console.error(error);
