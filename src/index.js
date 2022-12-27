@@ -55,7 +55,7 @@ const client = mqtt.connect(options)
   
   
   client.subscribe("dentists");
-  client.subscribe("dentist/getdentistbyId");
+/*   client.subscribe("dentist/getdentistbyId");
   client.publish("message1", 'yup this message one');
 
   if (topic == "dentist/getAllDentists") {
@@ -129,6 +129,98 @@ const client = mqtt.connect(options)
       });
   }
 } */
+ 
+client.subscribe('dentist/get-AllDentists', function () {
+  // When a message arrives, print it to the console
+  client.on('message', function (topic, message) {
+
+    console.log("Received this lovely " + message + "  on " + topic + " all den")
+    
+    if (topic == "dentist/get-AllDentists") {
+      Dentist.find(function (err, dentists) {
+        if (err) {
+          return next(err);
+        }
+        let dentistsJson = JSON.stringify(dentists);
+        client.publish("ui/dentist/getAllDentists", dentistsJson, { qos: 1, retain: true },
+          (error) => {
+            if (error) {
+              console.error(error);
+            }
+            console.log("sent to ui!" + dentistsJson);
+          }
+        );
+      });
+    } else if (topic == "dentist/getdentistbyId") {
+      Dentist.findOne({ _id: message.toString() }).exec(function (err, dentists) {
+          
+          let dentistsJson = JSON.stringify(dentists);
+          client.publish(
+              "ui/dentist/getdentistbyId",
+              dentistsJson,
+              { qos: 1, retain: true },
+              (error) => {
+                  if (error) {
+                      console.error(error);
+                  }
+                  console.log("sent to ui for this 1!" + dentistsJson);
+              }
+          );
+      });
+    } 
+
+})
+}) 
+
+client.subscribe("dentist/getdentistbyId");
+
+/* if (topic == "dentist/getdentistbyId") {
+  Dentist.findOne({ _id: payload.toString() }).exec(function (err, dentists) {
+      if (err) {
+          return next(err);
+      }
+      let dentistsJson = JSON.stringify(dentists);
+      client.publish(
+          "ui/dentist/getdentistbyId",
+          dentistsJson,
+          { qos: 1, retain: true },
+          (error) => {
+              if (error) {
+                  console.error(error);
+              }
+          }
+      );
+  });
+}  */
+/* client.subscribe('dentist/getdentistbyId', function () {
+  // When a message arrives, print it to the console
+  client.on('message', function (topic, message) {
+
+    console.log("Received this lovely " + message + "  on " + topic + " this 0ne found")
+    
+    if (topic == "dentist/getdentistbyId") {
+      Dentist.findOne({ _id: message.toString() }).exec(function (err, dentists) {
+          if (err) {
+              return next(err);
+          }
+          let dentistsJson = JSON.stringify(dentists);
+          console.log("sent to ui!" + dentistsJson);
+          client.publish(
+              "ui/dentist/getdentistbyId",
+              dentistsJson,
+              { qos: 1, retain: false },
+              (error) => {
+                  if (error) {
+                      console.error(error);
+                  }
+                  console.log("sent to ui!" + dentistsJson);
+              }
+          );
+      });
+  }  
+
+})
+}) */
 
 
 
