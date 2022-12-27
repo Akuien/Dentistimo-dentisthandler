@@ -174,6 +174,39 @@ client.subscribe('dentist/get-AllDentists', function () {
 })
 }) 
 
+client.subscribe('dentist/getdentistbyId', function () {
+  // When a message arrives, print it to the console
+  client.on('message', function (topic, message) {
+
+    console.log("Received this lovely " + message + "  on " + topic + " all den")
+    
+    if (topic == "dentist/getdentistbyId") {
+      Dentist.find(
+        { _id: message.toString() },
+        function (err, dentists) {
+    
+        /* if (err) {
+          return next(err);
+        } */
+          let dentistsJson = JSON.stringify(dentists);
+          client.publish(
+              "ui/dentist/getdentistbyId",
+              dentistsJson, 2,
+              (error) => {
+                  if (error) {
+                      console.error(error);
+                  }
+                  console.log("sent to ui for this 1!" + dentistsJson);
+              }
+          );
+      });
+    } 
+
+})
+}) 
+
+
+
 client.subscribe("dentist/getdentistbyId");
 
 /* if (topic == "dentist/getdentistbyId") {
