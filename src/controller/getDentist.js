@@ -22,10 +22,7 @@ function getDentist(topic, payload) {
             console.log("Clinic found: ", dentists);
 
             let dentistsJson = JSON.stringify(dentists);
-            client.publish(
-                "ui/get-dental-clinic",
-                dentistsJson,
-                { qos: 1, retain: false },
+            client.publish("ui/get-dental-clinic",dentistsJson,{ qos: 1, retain: false },
                 (error) => {
                     if (error) {
                         console.error(error);
@@ -43,10 +40,7 @@ function getDentist(topic, payload) {
             console.log("Clinic Found: ", dentists);
 
             let dentistsJson = JSON.stringify(dentists);
-            client.publish(
-                "ui/dental-clinic",
-                dentistsJson,
-                { qos: 1, retain: false },
+            client.publish("ui/dental-clinic", dentistsJson,{ qos: 1, retain: false },
                 (error) => {
                     if (error) {
                         console.error(error);
