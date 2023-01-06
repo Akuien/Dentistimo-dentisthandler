@@ -1,5 +1,5 @@
 var Dentist = require('../model/dentist');
-let topic = "dentist/#";
+let topic = "dentist/";
 const mqtt = require("mqtt");
   
 const options = {
