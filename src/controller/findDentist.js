@@ -2,17 +2,16 @@ var Dentist = require('../model/dentist');
 let topic = "dentist/#";
 const mqtt = require("mqtt");
   
-  const options = {
+const options = {
     host: '45fb8d87df7040eb8434cea2937cfb31.s1.eu.hivemq.cloud',
     port: 8883,
     protocol: 'mqtts',
     username: 'Team5@Broker',
     password: 'Team5@Broker'
   } 
+const client = mqtt.connect(options)
 
-  const client = mqtt.connect(options)
-
-function getDentist(topic, payload) {
+function findDentist(topic, payload) {
 
     if (topic == "dentist/getdentistbyId") {
         Dentist.findOne({ _id: payload.toString() }).exec(function (err, dentists) {
@@ -51,4 +50,4 @@ function getDentist(topic, payload) {
         });
     }
 }
-module.exports.getDentist = getDentist;
+module.exports.findDentist = findDentist;

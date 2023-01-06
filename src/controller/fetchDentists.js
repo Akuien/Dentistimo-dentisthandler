@@ -1,7 +1,8 @@
 var fetch  = require('node-fetch');
 var Dentist = require('../model/dentist');
 const mqtt = require("mqtt");
-var mongoose = require('mongoose');
+var database = require('../Database/database');
+/* var mongoose = require('mongoose');
 
 var mongoURI = process.env.MONGODB_URI || 'mongodb+srv://Dentistimo:QsyJymgvpYZZeJPc@cluster0.hnkdpp5.mongodb.net/?retryWrites=true&w=majority'; 
 
@@ -13,7 +14,7 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true }, 
         process.exit(1);
     }
     console.log(`Connected to MongoDB with URI: ${mongoURI}`);
-}); 
+});  */
   
     async function fetchDentists(){
         try {
