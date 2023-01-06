@@ -13,38 +13,38 @@ const client = mqtt.connect(options)
 
 function findDentist(topic, payload) {
 
-    if (topic == "dentist/getdentistbyId") {
+    if (topic == "dentist/dentistById/request") {
         Dentist.findOne({ _id: payload.toString() }).exec(function (err, dentists) {
            /*  if (err) {
                 return next(err);
             } */
-            console.log("Clinic found: ", dentists);
+            //console.log("Clinic found: ", dentists);
 
-            let dentistsJson = JSON.stringify(dentists);
-            client.publish("ui/get-dental-clinic",dentistsJson,{ qos: 1, retain: false },
+            let responseString = JSON.stringify(dentists);
+            client.publish("getDentistById/response",responseString,{ qos: 1, retain: false },
                 (error) => {
                     if (error) {
                         console.error(error);
                     }
-                    console.log("The dental clinic sent to ui:", dentistsJson);
+                    console.log("This dental clinic sent to ui:", responseString);
                 }
             );
         });
-    } else if (topic == "dentist/getAllDentists") {
+    } else if (topic == "dentist/getAllDentists/request") {
         Dentist.find(function (err, dentists) {
             if (err) {
                 return next(err);
             }
 
-            console.log("Clinic Found: ", dentists);
+            console.log("Clinics Found: ", dentists);
 
-            let dentistsJson = JSON.stringify(dentists);
-            client.publish("ui/dental-clinic", dentistsJson,{ qos: 1, retain: false },
+            let responseString = JSON.stringify(dentists);
+            client.publish("getAllDentists/response", responseString, { qos: 1, retain: false },
                 (error) => {
                     if (error) {
                         console.error(error);
                     }
-                    console.log("All the Dental Clinics have been sent to the UI:", dentistsJson);
+                    console.log("All the Dental Clinics have been sent to the UI");
                 }
             );
         });
