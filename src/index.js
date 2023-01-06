@@ -1,6 +1,6 @@
 const mqtt = require("mqtt");
 const mongoose = require("mongoose");
-const  DentistRetriever  = require("./controller/dentistRetriever")
+const  fetchDentists  = require("./controller/fetchDentists")
 const  DentistByID  = require("./controller/getDentist")
 
 // Variables
@@ -35,7 +35,7 @@ client.on("connect", () => {
   });
 });
 
-DentistRetriever.dentistRetriever()
+fetchDentists.fetchDentists()
 
 client.on("message", (topic, payload) => {
   console.log('Received message here: ', topic, ':==>:', payload.toString());

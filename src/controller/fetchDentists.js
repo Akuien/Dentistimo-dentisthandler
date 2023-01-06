@@ -15,10 +15,10 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true }, 
     console.log(`Connected to MongoDB with URI: ${mongoURI}`);
 }); 
   
-    async function dentistRetriever(){
+    async function fetchDentists(){
         try {
-        const fetchDentists = await fetch("https://raw.githubusercontent.com/feldob/dit355_2020/master/dentists.json");
-        const response = await fetchDentists.json();
+        const fetchDentist = await fetch("https://raw.githubusercontent.com/feldob/dit355_2020/master/dentists.json");
+        const response = await fetchDentist.json();
         console.log(response.dentists);
         
         for (let i = 0; i < response.dentists.length; i++) {
@@ -56,10 +56,10 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true }, 
             return console.error(err);
           }
         };
-        dentistRetriever();
+        fetchDentists();
 
         const findOneDentist = async (filter) => {
           return Dentist.findOne(filter).exec();
         };
 
-module.exports.dentistRetriever = dentistRetriever; 
+module.exports.fetchDentists = fetchDentists; 
